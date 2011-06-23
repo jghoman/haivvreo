@@ -1,0 +1,98 @@
+{
+  "namespace": "com.linkedin.haivvreo",
+  "name": "kitchsink",
+  "doc": "this is the kitchensink schema with all types we support.",
+  "type": "record",
+  "fields": [
+    {
+      "name":"string1",
+      "type":"string",
+      "doc":"this field is string1"
+    },
+    {
+      "name":"string2",
+      "type":"string",
+      "doc":"this field is string2"
+    },
+    {
+      "name":"int1",
+      "type":"int",
+      "doc":"this field is int1"
+    },
+    {
+      "name":"boolean1",
+      "type":"boolean",
+      "doc":"this field is boolean1"
+    },
+    {
+      "name":"long1",
+      "type":"long",
+      "doc":"this field is long1"
+    },
+    {
+      "name":"float1",
+      "type":"float",
+      "doc":"this field is float1"
+    },
+    {
+      "name":"double1",
+      "type":"double",
+      "doc":"this field is double1"
+    },
+    {
+      "name":"inner_record1",
+      "type":{ "type":"record",
+               "name":"inner_record1_impl",
+               "fields": [
+                          {"name":"int_in_inner_record1",
+                           "type":"int",
+                           "doc":"this field is int_in_inner_record1"},
+                          {"name":"string_in_inner_record1",
+                           "type":"string",
+                           "doc":"this field is string_in_inner_record1"}
+                         ]
+       },
+      "doc":"this field is inner_record1"
+    },
+    {
+      "name":"enum1",
+      "type":{"type":"enum", "name":"enum1_values", "symbols":["ENUM1_VALUES_VALUE1","ENUM1_VALUES_VALUE2", "ENUM1_VALUES_VALUE3"]},
+      "doc":"this field is enum1"
+    },
+    {
+      "name":"array1",
+      "type":{"type":"array", "items":"string"},
+      "doc":"this field is array1"
+    },
+    {
+      "name":"map1",
+      "type":{"type":"map", "values":"string"},
+      "doc":"this field is map1"
+    },
+    {
+      "name":"union1",
+      "type":["float", "boolean", "string"],
+      "doc":"this field is union1"
+    },
+    {
+      "name":"fixed1",
+      "type":{"type":"fixed", "name":"fourbytes", "size":4},
+      "doc":"this field is fixed1"
+    },
+    {
+      "name":"null1",
+      "type":"null",
+      "doc":"this field is null1"
+    },
+    {
+      "name":"UnionNullInt",
+      "type":["int", "null"],
+      "doc":"this field is UnionNullInt"
+    },
+    {
+      "name":"bytes1",
+      "type":"bytes",
+      "doc":"this field is bytes1"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+Various scripts and files used in manual testing
+
+kitchensink.sql - create a table on hive mirroring the kitchensink schema
+test_serializer.csv - sample data for tests that serialize data to Avro
+test_serializer.sql - create a table on hive for writing data to Avro from Hive
