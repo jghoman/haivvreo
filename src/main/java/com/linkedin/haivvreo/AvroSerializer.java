@@ -31,7 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class AvroSerializer {
+class AvroSerializer {
   private static final Log LOG = LogFactory.getLog(AvroSerializer.class);
 
   AvroGenericRecordWritable cache = new AvroGenericRecordWritable();
