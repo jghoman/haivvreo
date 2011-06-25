@@ -75,6 +75,12 @@ class SchemaToTypeInfo {
     return types;
   }
 
+  static InstanceCache<Schema, TypeInfo> typeInfoCache = new InstanceCache<Schema, TypeInfo>() {
+                                  @Override
+                                  protected TypeInfo makeInstance(Schema s) throws HaivvreoException {
+                                    return generateTypeInfoWorker(s);
+                                  }
+                                };
   /**
    * Convert an Avro Schema into an equivalent Hive TypeInfo.
    * @param schema to record. Must be of record type.
@@ -82,6 +88,10 @@ class SchemaToTypeInfo {
    * @throws HaivvreoException for any problems during conversion.
    */
   public static TypeInfo generateTypeInfo(Schema schema) throws HaivvreoException {
+    return typeInfoCache.makeInstance(schema);
+  }
+
+  private static TypeInfo generateTypeInfoWorker(Schema schema) throws HaivvreoException {
     // Avro requires NULLable types to be defined as unions of some type T
     // and NULL.  This is annoying and we're going to hide it from the user.
     if(HaivvreoUtils.isNullableType(schema))

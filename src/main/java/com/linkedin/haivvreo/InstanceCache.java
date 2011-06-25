@@ -15,6 +15,7 @@
  */
 package com.linkedin.haivvreo;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -34,7 +35,7 @@ public abstract class InstanceCache<SeedObject, Instance> {
    * Retrieve (or create if it doesn't exist) the correct Instance for this
    * SeedObject
    */
-  public Instance retrieve(SeedObject hv) {
+  public Instance retrieve(SeedObject hv) throws HaivvreoException {
     if(cache.containsKey(hv.hashCode())) return cache.get(hv.hashCode());
     
     Instance instance = makeInstance(hv);
@@ -42,5 +43,5 @@ public abstract class InstanceCache<SeedObject, Instance> {
     return instance;
   }
 
-  protected abstract Instance makeInstance(SeedObject hv);
+  protected abstract Instance makeInstance(SeedObject hv) throws HaivvreoException ;
 }

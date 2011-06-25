@@ -36,7 +36,7 @@ public class TestInstanceCache {
   }
 
   @Test
-  public void instanceCachesOnlyCreateOneInstance() {
+  public void instanceCachesOnlyCreateOneInstance() throws HaivvreoException {
     InstanceCache<Foo, Wrapper<Foo>> ic = new InstanceCache<Foo, Wrapper<Foo>>() {
                                            @Override
                                            protected Wrapper makeInstance(Foo hv) {
@@ -56,7 +56,7 @@ public class TestInstanceCache {
   }
 
   @Test
-  public void instanceCacheReturnsCorrectInstances() {
+  public void instanceCacheReturnsCorrectInstances() throws HaivvreoException {
     InstanceCache<String, Wrapper<String>> ic = new InstanceCache<String, Wrapper<String>>() {
                                                     @Override
                                                     protected Wrapper<String> makeInstance(String hv) {
