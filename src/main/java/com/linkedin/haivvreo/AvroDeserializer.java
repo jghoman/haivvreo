@@ -32,6 +32,7 @@ import org.apache.hadoop.io.Writable;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,13 @@ class AvroDeserializer {
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     private final GenericDatumWriter<GenericRecord> gdw = new GenericDatumWriter<GenericRecord>();
     private BinaryDecoder binaryDecoder = null;
+    private InstanceCache<ReaderWriterSchemaPair, GenericDatumReader<GenericRecord>> gdrCache
+        = new InstanceCache<ReaderWriterSchemaPair, GenericDatumReader<GenericRecord>>() {
+            @Override
+            protected GenericDatumReader<GenericRecord> makeInstance(ReaderWriterSchemaPair hv) {
+              return new GenericDatumReader<GenericRecord>(hv.getWriter(), hv.getReader());
+            }
+          };
 
     public GenericRecord reencode(GenericRecord r, Schema readerSchema) throws HaivvreoException {
       baos.reset();
@@ -61,7 +69,9 @@ class AvroDeserializer {
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
         binaryDecoder = DecoderFactory.defaultFactory().createBinaryDecoder(bais, binaryDecoder);
-        GenericDatumReader<GenericRecord> gdr = new GenericDatumReader<GenericRecord>(r.getSchema(), readerSchema);
+
+        ReaderWriterSchemaPair pair = new ReaderWriterSchemaPair(r.getSchema(), readerSchema);
+        GenericDatumReader<GenericRecord> gdr = gdrCache.retrieve(pair);
         return gdr.read(r, binaryDecoder);
 
       } catch (IOException e) {
