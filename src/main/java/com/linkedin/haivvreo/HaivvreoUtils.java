@@ -95,4 +95,9 @@ class HaivvreoUtils {
 
     return types.get(0).getType().equals(Schema.Type.NULL) ? types.get(1) : types.get(0);
   }
+
+  public static <T> T notNull(T o, String name) throws HaivvreoException {
+    if(o == null) throw new HaivvreoException(name + " cannot be null");
+    return o;
+  }
 }

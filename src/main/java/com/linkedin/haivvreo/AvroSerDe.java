@@ -27,29 +27,48 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import static com.linkedin.haivvreo.HaivvreoUtils.notNull;
+
 /**
  * Read or write Avro data from Hive.
  */
 public class AvroSerDe implements SerDe {
-
   private ObjectInspector oi;
   private List<String> columnNames;
   private List<TypeInfo> columnTypes;
   private Schema schema;
   private AvroDeserializer avroDeserializer = null;
   private AvroSerializer avroSerializer = null;
+  private Properties props = null;
+  private boolean inited = false;
 
   @Override
   public void initialize(Configuration configuration, Properties properties) throws SerDeException {
+    this.props = properties;
+    inited = false; // reset the serde
+    oi = null;
+    columnNames = null;
+    columnTypes = null;
+    schema = null;
+  }
+
+  // Do the actual initialization lazily, otherwise Hive throws up bogus errors
+  // while describing the table, etc.
+  private void init() throws SerDeException {
+    if(inited) return;
+    notNull(props, "Properties from which to obtain schema");
+
     try {
-      schema = HaivvreoUtils.determineSchema(properties);
+      schema = HaivvreoUtils.determineSchema(props);
     } catch (IOException e) {
       throw new HaivvreoException(e);
     }
+
     AvroObjectInspectorGenerator aoig = new AvroObjectInspectorGenerator(schema);
     this.columnNames = aoig.getColumnNames();
     this.columnTypes = aoig.getColumnTypes();
     this.oi = aoig.getObjectInspector();
+    inited = true;
   }
 
   @Override
@@ -59,16 +78,19 @@ public class AvroSerDe implements SerDe {
 
   @Override
   public Writable serialize(Object o, ObjectInspector objectInspector) throws SerDeException {
+    init();
     return getSerializer().serialize(o, objectInspector, columnNames, columnTypes, schema);
   }
 
   @Override
   public Object deserialize(Writable writable) throws SerDeException {
+    init();
     return getDeserializer().deserialize(columnNames, columnTypes, writable, schema);
   }
 
   @Override
   public ObjectInspector getObjectInspector() throws SerDeException {
+    init();
     return oi;
   }
 
