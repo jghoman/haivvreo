@@ -214,6 +214,10 @@ To execute this script file, assuming $SCHEMA has been defined to be the escaped
 <pre>hive -hiveconf schema="${SCHEMA}" -f your_script_file.sql</pre>
 Note that $SCHEMA is interpolated into the quotes to correctly handle spaces within the schema.
 
+**Use none to ignore either schema.literal or schema.url**
+
+Hive does not provide an easy way to unset or remove a property. If you wish to switch from using url or schema to the other, set the to-be-ignored value to *none* and Haivvreo will treat it as if it were not set.
+
 If something goes wrong
 -----------------------
 Hive tends to swallow exceptions from Haivvreo that occur before job submission. To force Hive to be more verbose, it can be started with **hive -hiveconf hive.root.logger=INFO,console**, which will spit orders of magnitude more information to the console and will likely include any information Haivvreo is trying to get you about what went wrong.  If Haivvreo encounters an error during MapReduce, the stack trace will be provided in the failed task log, which can be examined from the JobTracker's web interface.  Haivvreo only emits HaivvreoException; look for these.  Please include these in any bug reports.  The most common is expected to be exceptions while attempting to serializing an incompatible type from what Avro is expecting.

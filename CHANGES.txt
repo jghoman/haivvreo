@@ -1,4 +1,7 @@
 Haivvreo change log:
 
+1.0.3
+  * Introduce none as an option for schema.url and schema.literal
+  * Caching of GenericRecordReaderand SchemaToTypeInfo mappings
 1.0.2 Lazy init of serializer/deserializer was overly so.
 1.0.1 Add ability to read schema from HDFS.

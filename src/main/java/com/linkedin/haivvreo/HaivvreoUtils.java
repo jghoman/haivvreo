@@ -29,6 +29,9 @@ import java.util.Properties;
 class HaivvreoUtils {
   public static final String SCHEMA_LITERAL = "schema.literal";
   public static final String SCHEMA_URL = "schema.url";
+  public static final String SCHEMA_NONE = "none";
+  public static final String EXCEPTION_MESSAGE = "Neither " + SCHEMA_LITERAL + " nor "
+          + SCHEMA_URL + " specified, can't determine table schema";
 
   /**
    * Determine the schema to that's been provided for Avro serde work.
@@ -39,17 +42,16 @@ class HaivvreoUtils {
    */
   public static Schema determineSchema(Properties properties) throws IOException, HaivvreoException {
     String schemaString = properties.getProperty(SCHEMA_LITERAL);
-    if(schemaString != null)
+    if(schemaString != null && !schemaString.equals(SCHEMA_NONE))
       return Schema.parse(schemaString);
 
     // Try pulling directly from URL
     schemaString = properties.getProperty(SCHEMA_URL);
-    if(schemaString == null)
-      throw new HaivvreoException("Neither " + SCHEMA_LITERAL + " nor "
-          + SCHEMA_URL + " specified, can't determine table schema");
+    if(schemaString == null || schemaString.equals(SCHEMA_NONE))
+      throw new HaivvreoException(EXCEPTION_MESSAGE);
 
     try {
-      if(schemaString.startsWith("hdfs://"))
+      if(schemaString.toLowerCase().startsWith("hdfs://"))
         return getSchemaFromHDFS(schemaString, new Configuration());
     } catch(IOException ioe) {
       throw new HaivvreoException("Unable to read schema from HDFS: " + schemaString, ioe);

@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static com.linkedin.haivvreo.HaivvreoUtils.*;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class TestHaivvreoUtils {
@@ -129,6 +130,42 @@ public class TestHaivvreoUtils {
     try {
       HaivvreoUtils.determineSchema(props);
       fail("Should have tried to open that URL");
+    } catch(MalformedURLException e) {
+      assertEquals("unknown protocol: not", e.getMessage());
+    }
+  }
+
+  @Test
+  public void noneOptionWorksForSpecifyingSchemas() throws IOException, HaivvreoException {
+    Properties props = new Properties();
+
+    // Combo 1: Both set to none
+    props.put(SCHEMA_URL, SCHEMA_NONE);
+    props.put(SCHEMA_LITERAL, SCHEMA_NONE);
+    try {
+      determineSchema(props);
+      fail("Should have thrown exception with none set for both url and literal");
+    } catch(HaivvreoException he) {
+      assertEquals(EXCEPTION_MESSAGE, he.getMessage());
+    }
+
+    // Combo 2: Literal set, url set to none
+    props.put(SCHEMA_LITERAL, TestAvroObjectInspectorGenerator.RECORD_SCHEMA);
+    Schema s;
+    try {
+      s = determineSchema(props);
+      assertNotNull(s);
+      assertEquals(Schema.parse(TestAvroObjectInspectorGenerator.RECORD_SCHEMA), s);
+    } catch(HaivvreoException he) {
+      fail("Should have parsed schema literal, not thrown exception.");
+    }
+
+    // Combo 3: url set, literal set to none
+    props.put(SCHEMA_LITERAL, SCHEMA_NONE);
+    props.put(SCHEMA_URL, "not:///a.real.url");
+    try {
+      determineSchema(props);
+      fail("Should have tried to open that bogus URL");
     } catch(MalformedURLException e) {
       assertEquals("unknown protocol: not", e.getMessage());
     }
