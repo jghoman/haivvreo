@@ -228,8 +228,3 @@ We're currently testing Haivvreo in our production ETL process and have found it
 
 Please kick the tires and file bugs.
 
-Change log
-----------
-* 1.0.2 Lazy initialization of the serializer/deserializer is a bit too lazy. Also, first open-source release.
-* 1.0.1 Add ability to specify schema via hdfs location.
-* 1.0.0 Initial release for testing.
