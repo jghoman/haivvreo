@@ -222,7 +222,12 @@ If something goes wrong
 -----------------------
 Hive tends to swallow exceptions from Haivvreo that occur before job submission. To force Hive to be more verbose, it can be started with **hive -hiveconf hive.root.logger=INFO,console**, which will spit orders of magnitude more information to the console and will likely include any information Haivvreo is trying to get you about what went wrong.  If Haivvreo encounters an error during MapReduce, the stack trace will be provided in the failed task log, which can be examined from the JobTracker's web interface.  Haivvreo only emits HaivvreoException; look for these.  Please include these in any bug reports.  The most common is expected to be exceptions while attempting to serializing an incompatible type from what Avro is expecting.
 
-What's next
+FAQ
+---
+* Why do I get a **java.io.IOException: com.linkedin.haivvreo.HaivvreoException: Neither schema.literal nor schema.url specified, can't determine table schema** when pruning by a partition that doesn't exist?
+> Hive creates a temporary empty file for non-existent partitions in order that queries referencing them succeed (returning a count of zero rows).  However, when doing so, it doesn't pass the correct information to the RecordWriter, leaving Haivvreo unable to construct one.  A JIRA has been opened with [Hive to correct this](https://issues.apache.org/jira/browse/HIVE-2260).  In the meantime, be sure to only filter on existing partitions.
+
+ What's next
 -----------
 We're currently testing Haivvreo in our production ETL process and have found it reliable and flexible.  We'll be working on improving its performance (there are several opportunities for improvement both in Hive and Haivvreo itself).  The next feature we'll add is schema induction when writing from Hive tables so that it is not necessary to provide an equivalent Avro schema ahead of time.
 
