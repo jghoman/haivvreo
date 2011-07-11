@@ -25,6 +25,8 @@ import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.util.Utf8;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardUnionObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.*;
 import org.apache.hadoop.io.Writable;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 class AvroDeserializer {
+  private static final Log LOG = LogFactory.getLog(AvroDeserializer.class);
   /**
    * When encountering a record with an older schema than the one we're trying
    * to read, it is necessary to re-encode with a reader against the newer schema.
@@ -112,6 +115,7 @@ class AvroDeserializer {
 
     // Check if we're working with an evolved schema
     if(!r.getSchema().equals(readerSchema)) {
+      LOG.info("Received different schemas.  Have to re-encode: " + r.getSchema().toString(false));
       if(reEncoder == null) reEncoder = new SchemaReEncoder();
       r = reEncoder.reencode(r, readerSchema);
     }

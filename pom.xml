@@ -5,7 +5,7 @@
   <groupId>com.linkedin</groupId>
   <artifactId>haivvreo</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4-SNAPSHOT</version>
   <name>haivvreo</name>
   <url>https://github.com/jghoman/haivvreo</url>
   <description>Library for processing Avro data in Hive.</description>

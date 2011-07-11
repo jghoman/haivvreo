@@ -32,6 +32,7 @@ import java.util.Properties;
  */
 public class AvroSerDe implements SerDe {
 
+  public static final String HAIVVREO_SCHEMA = "haivvreo.schema";
   private ObjectInspector oi;
   private List<String> columnNames;
   private List<TypeInfo> columnTypes;
@@ -42,10 +43,17 @@ public class AvroSerDe implements SerDe {
   @Override
   public void initialize(Configuration configuration, Properties properties) throws SerDeException {
     try {
-      schema = HaivvreoUtils.determineSchema(properties);
+      String schemaString = configuration.get(HAIVVREO_SCHEMA);
+      if(schemaString != null)
+        schema = Schema.parse(schemaString);
+      else {
+        schema = HaivvreoUtils.determineSchema(properties);
+        configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
+      }
     } catch (IOException e) {
       throw new HaivvreoException(e);
     }
+
     AvroObjectInspectorGenerator aoig = new AvroObjectInspectorGenerator(schema);
     this.columnNames = aoig.getColumnNames();
     this.columnTypes = aoig.getColumnTypes();

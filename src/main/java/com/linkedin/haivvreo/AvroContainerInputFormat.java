@@ -17,7 +17,13 @@ package com.linkedin.haivvreo;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.JobConfigurable;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,8 +43,8 @@ public class AvroContainerInputFormat extends FileInputFormat<NullWritable, Avro
   }
 
   @Override
-  public RecordReader<NullWritable, AvroGenericRecordWritable> getRecordReader(InputSplit inputSplit, JobConf jobConf, Reporter reporter) throws IOException {
-    return new AvroGenericRecordReader(jobConf, (FileSplit) inputSplit, reporter);
+  public RecordReader<NullWritable, AvroGenericRecordWritable> getRecordReader(InputSplit inputSplit, JobConf jc, Reporter reporter) throws IOException {
+    return new AvroGenericRecordReader(jc, (FileSplit) inputSplit, reporter);
   }
 
   @Override

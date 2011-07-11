@@ -1,5 +1,6 @@
 Haivvreo change log:
 
+1.0.4 Use reader schema in record reader, no longer need to re-encode in serde
 1.0.3
   * Introduce none as an option for schema.url and schema.literal
   * Caching of GenericRecordReaderand SchemaToTypeInfo mappings
