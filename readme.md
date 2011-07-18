@@ -226,7 +226,7 @@ FAQ
 ---
 * Why do I get a **java.io.IOException: com.linkedin.haivvreo.HaivvreoException: Neither schema.literal nor schema.url specified, can't determine table schema** when pruning by a partition that doesn't exist?
 
-> Hive creates a temporary empty file for non-existent partitions in order that queries referencing them succeed (returning a count of zero rows).  However, when doing so, it doesn't pass the correct information to the RecordWriter, leaving Haivvreo unable to construct one.  A JIRA has been opened with [Hive to correct this](https://issues.apache.org/jira/browse/HIVE-2260).  In the meantime, be sure to only filter on existing partitions.
+> Hive creates a temporary empty file for non-existent partitions in order that queries referencing them succeed (returning a count of zero rows).  However, when doing so, it doesn't pass the correct information to the RecordWriter, leaving Haivvreo unable to construct one.  This problem has been corrected in [Hive 0.8](https://issues.apache.org/jira/browse/HIVE-2260) .  With previous versions of Hive, either be sure to only filter on existing partitions or apply HIVE-2260.
 
  What's next
 -----------
