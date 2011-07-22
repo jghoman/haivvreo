@@ -43,13 +43,8 @@ public class AvroSerDe implements SerDe {
   @Override
   public void initialize(Configuration configuration, Properties properties) throws SerDeException {
     try {
-      String schemaString = configuration.get(HAIVVREO_SCHEMA);
-      if(schemaString != null)
-        schema = Schema.parse(schemaString);
-      else {
-        schema = HaivvreoUtils.determineSchema(properties);
-        configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
-      }
+      schema = HaivvreoUtils.determineSchema(properties);
+      configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
     } catch (IOException e) {
       throw new HaivvreoException(e);
     }
