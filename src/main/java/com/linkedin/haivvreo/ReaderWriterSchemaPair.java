@@ -36,7 +36,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class ReaderWriterSchemaPair {
+/**
+ * Simple pair class used for memoizing schema-reencoding operations.
+ */
+class ReaderWriterSchemaPair {
   final Schema reader;
   final Schema writer;
 
