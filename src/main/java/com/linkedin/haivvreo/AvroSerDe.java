@@ -23,7 +23,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.Writable;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,7 +30,6 @@ import java.util.Properties;
  * Read or write Avro data from Hive.
  */
 public class AvroSerDe implements SerDe {
-
   public static final String HAIVVREO_SCHEMA = "haivvreo.schema";
   private ObjectInspector oi;
   private List<String> columnNames;
@@ -40,14 +38,20 @@ public class AvroSerDe implements SerDe {
   private AvroDeserializer avroDeserializer = null;
   private AvroSerializer avroSerializer = null;
 
+  private boolean badSchema = false;
+
   @Override
   public void initialize(Configuration configuration, Properties properties) throws SerDeException {
-    try {
-      schema = HaivvreoUtils.determineSchema(properties);
-      configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
-    } catch (IOException e) {
-      throw new HaivvreoException(e);
-    }
+    // Reset member variables so we don't get in a half-constructed state
+    schema = null;
+    oi = null;
+    columnNames  = null;
+    columnTypes = null;
+
+    schema =  HaivvreoUtils.determineSchemaOrReturnErrorSchema(properties);
+    configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
+
+    badSchema = schema.equals(SchemaResolutionProblem.SIGNAL_BAD_SCHEMA);
 
     AvroObjectInspectorGenerator aoig = new AvroObjectInspectorGenerator(schema);
     this.columnNames = aoig.getColumnNames();
@@ -62,11 +66,13 @@ public class AvroSerDe implements SerDe {
 
   @Override
   public Writable serialize(Object o, ObjectInspector objectInspector) throws SerDeException {
+    if(badSchema) throw new BadSchemaException();
     return getSerializer().serialize(o, objectInspector, columnNames, columnTypes, schema);
   }
 
   @Override
   public Object deserialize(Writable writable) throws SerDeException {
+    if(badSchema) throw new BadSchemaException();
     return getDeserializer().deserialize(columnNames, columnTypes, writable, schema);
   }
 

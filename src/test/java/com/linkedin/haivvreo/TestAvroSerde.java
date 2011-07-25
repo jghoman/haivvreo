@@ -18,13 +18,19 @@ package com.linkedin.haivvreo;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde2.SerDeException;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.StructField;
+import org.apache.hadoop.io.Writable;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import java.util.List;
 import java.util.Properties;
 
 import static com.linkedin.haivvreo.AvroSerDe.HAIVVREO_SCHEMA;
 import static com.linkedin.haivvreo.HaivvreoUtils.SCHEMA_LITERAL;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TestAvroSerde {
    static final String originalSchemaString = "{\n" +
@@ -71,5 +77,87 @@ public class TestAvroSerde {
     // Verify that the schema now within the configuration is the one passed
     // in via the properties
     assertEquals(newSchema, Schema.parse(conf.get(HAIVVREO_SCHEMA)));
+  }
+
+  @Test
+  public void noSchemaProvidedReturnsErrorSchema() throws SerDeException {
+    Properties props = new Properties();
+
+    verifyErrorSchemaReturned(props);
+  }
+
+  @Test
+  public void gibberishSchemaProvidedReturnsErrorSchema() throws SerDeException {
+    Properties props = new Properties();
+    props.put(HaivvreoUtils.SCHEMA_LITERAL, "blahblahblah");
+
+    verifyErrorSchemaReturned(props);
+  }
+
+  @Test
+  public void emptySchemaProvidedReturnsErrorSchema() throws SerDeException {
+    Properties props = new Properties();
+    props.put(HaivvreoUtils.SCHEMA_LITERAL, "");
+
+    verifyErrorSchemaReturned(props);
+  }
+
+  @Test
+  public void badSchemaURLProvidedReturnsErrorSchema() throws SerDeException {
+    Properties props = new Properties();
+    props.put(HaivvreoUtils.SCHEMA_URL, "not://a/url");
+
+    verifyErrorSchemaReturned(props);
+  }
+
+  @Test
+  public void emptySchemaURLProvidedReturnsErrorSchema() throws SerDeException {
+    Properties props = new Properties();
+    props.put(HaivvreoUtils.SCHEMA_URL, "");
+
+    verifyErrorSchemaReturned(props);
+  }
+
+  @Test
+  public void bothPropertiesSetToNoneReturnsErrorSchema() throws SerDeException {
+    Properties props = new Properties();
+    props.put(HaivvreoUtils.SCHEMA_URL, HaivvreoUtils.SCHEMA_NONE);
+    props.put(HaivvreoUtils.SCHEMA_LITERAL, HaivvreoUtils.SCHEMA_NONE);
+
+    verifyErrorSchemaReturned(props);
+  }
+
+  private void verifyErrorSchemaReturned(Properties props) throws SerDeException {
+    AvroSerDe asd = new AvroSerDe();
+    asd.initialize(new Configuration(), props);
+    assertTrue(asd.getObjectInspector() instanceof StandardStructObjectInspector);
+    StandardStructObjectInspector oi = (StandardStructObjectInspector)asd.getObjectInspector();
+    List<? extends StructField> allStructFieldRefs = oi.getAllStructFieldRefs();
+    assertEquals(SchemaResolutionProblem.SIGNAL_BAD_SCHEMA.getFields().size(), allStructFieldRefs.size());
+    StructField firstField = allStructFieldRefs.get(0);
+    assertTrue(firstField.toString().contains("error-error-error-error-error-error-error"));
+
+    try {
+      Writable mock = Mockito.mock(Writable.class);
+      asd.deserialize(mock);
+      fail("Should have thrown a BadSchemaException");
+    } catch (BadSchemaException bse) {
+      // good
+    }
+
+    try {
+      Object o = Mockito.mock(Object.class);
+      ObjectInspector mockOI = Mockito.mock(ObjectInspector.class);
+      asd.serialize(o, mockOI);
+      fail("Should have thrown a BadSchemaException");
+    } catch (BadSchemaException bse) {
+      // good
+    }
+  }
+
+  @Test
+  public void getSerializedClassReturnsCorrectType() {
+    AvroSerDe asd = new AvroSerDe();
+    assertEquals(AvroGenericRecordWritable.class, asd.getSerializedClass());
   }
 }

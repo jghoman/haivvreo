@@ -82,7 +82,7 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
       for (PartitionDesc pd : aliasToPartnInfo.values()) {
         Properties props = pd.getProperties();
         if(props.containsKey(HaivvreoUtils.SCHEMA_LITERAL) || props.containsKey(HaivvreoUtils.SCHEMA_URL)) {
-          Schema schema = HaivvreoUtils.determineSchema(props);
+          Schema schema = HaivvreoUtils.determineSchemaOrThrowException(props);
           // while we're here, let's stash the schema in the jobconf for anyone coming after us
           job.set(AvroSerDe.HAIVVREO_SCHEMA, schema.toString(false));
           return schema;

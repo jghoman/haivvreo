@@ -20,7 +20,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -110,7 +109,7 @@ public class TestHaivvreoUtils {
   @Test(expected=HaivvreoException.class)
   public void determineSchemaThrowsExceptionIfNoSchema() throws IOException, HaivvreoException {
     Properties prop = new Properties();
-    HaivvreoUtils.determineSchema(prop);
+    HaivvreoUtils.determineSchemaOrThrowException(prop);
   }
 
   @Test
@@ -119,7 +118,7 @@ public class TestHaivvreoUtils {
     Properties props = new Properties();
     props.put(HaivvreoUtils.SCHEMA_LITERAL, schema);
     Schema expected = Schema.parse(schema);
-    assertEquals(expected, HaivvreoUtils.determineSchema(props));
+    assertEquals(expected, HaivvreoUtils.determineSchemaOrThrowException(props));
   }
 
   @Test
@@ -128,7 +127,7 @@ public class TestHaivvreoUtils {
     props.put(HaivvreoUtils.SCHEMA_URL, "not:///a.real.url");
 
     try {
-      HaivvreoUtils.determineSchema(props);
+      HaivvreoUtils.determineSchemaOrThrowException(props);
       fail("Should have tried to open that URL");
     } catch(MalformedURLException e) {
       assertEquals("unknown protocol: not", e.getMessage());
@@ -143,7 +142,7 @@ public class TestHaivvreoUtils {
     props.put(SCHEMA_URL, SCHEMA_NONE);
     props.put(SCHEMA_LITERAL, SCHEMA_NONE);
     try {
-      determineSchema(props);
+      determineSchemaOrThrowException(props);
       fail("Should have thrown exception with none set for both url and literal");
     } catch(HaivvreoException he) {
       assertEquals(EXCEPTION_MESSAGE, he.getMessage());
@@ -153,7 +152,7 @@ public class TestHaivvreoUtils {
     props.put(SCHEMA_LITERAL, TestAvroObjectInspectorGenerator.RECORD_SCHEMA);
     Schema s;
     try {
-      s = determineSchema(props);
+      s = determineSchemaOrThrowException(props);
       assertNotNull(s);
       assertEquals(Schema.parse(TestAvroObjectInspectorGenerator.RECORD_SCHEMA), s);
     } catch(HaivvreoException he) {
@@ -164,7 +163,7 @@ public class TestHaivvreoUtils {
     props.put(SCHEMA_LITERAL, SCHEMA_NONE);
     props.put(SCHEMA_URL, "not:///a.real.url");
     try {
-      determineSchema(props);
+      determineSchemaOrThrowException(props);
       fail("Should have tried to open that bogus URL");
     } catch(MalformedURLException e) {
       assertEquals("unknown protocol: not", e.getMessage());

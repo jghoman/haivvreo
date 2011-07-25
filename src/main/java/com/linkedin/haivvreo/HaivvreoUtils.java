@@ -16,6 +16,8 @@
 package com.linkedin.haivvreo;
 
 import org.apache.avro.Schema;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,6 +29,8 @@ import java.util.List;
 import java.util.Properties;
 
 class HaivvreoUtils {
+  private static final Log LOG = LogFactory.getLog(AvroDeserializer.class);
+
   public static final String SCHEMA_LITERAL = "schema.literal";
   public static final String SCHEMA_URL = "schema.url";
   public static final String SCHEMA_NONE = "none";
@@ -40,7 +44,7 @@ class HaivvreoUtils {
    * @throws IOException if error while trying to read the schema from another location
    * @throws HaivvreoException if unable to find a schema or pointer to it in the properties
    */
-  public static Schema determineSchema(Properties properties) throws IOException, HaivvreoException {
+  public static Schema determineSchemaOrThrowException(Properties properties) throws IOException, HaivvreoException {
     String schemaString = properties.getProperty(SCHEMA_LITERAL);
     if(schemaString != null && !schemaString.equals(SCHEMA_NONE))
       return Schema.parse(schemaString);
@@ -60,6 +64,24 @@ class HaivvreoUtils {
     return Schema.parse(new URL(schemaString).openStream());
   }
 
+  /**
+   * Attempt to determine the schema via the usual means, but do not throw
+   * an exception if we fail.  Instead, signal failure via a special
+   * schema.  This is used because Hive calls init on the serde during
+   * any call, including calls to update the serde properties, meaning
+   * if the serde is in a bad state, there is no way to update that state.
+   */
+  public static Schema determineSchemaOrReturnErrorSchema(Properties props) {
+    try {
+      return determineSchemaOrThrowException(props);
+    } catch(HaivvreoException he) {
+      LOG.warn("Encountered HaivvreoException determing schema. Returning signal schema to indicate problem", he);
+      return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
+    } catch (Exception e) {
+      LOG.warn("Encountered exception determing schema. Returning signal schema to indicate problem", e);
+      return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
+    }
+  }
   // Protected for testing and so we can pass in a conf for testing.
   protected static Schema getSchemaFromHDFS(String schemaHDFSUrl, Configuration conf) throws IOException {
     FileSystem fs = FileSystem.get(conf);
