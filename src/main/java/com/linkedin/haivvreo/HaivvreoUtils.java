@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Properties;
 
 class HaivvreoUtils {
-  private static final Log LOG = LogFactory.getLog(AvroDeserializer.class);
+  private static final Log LOG = LogFactory.getLog(HaivvreoUtils.class);
 
   public static final String SCHEMA_LITERAL = "schema.literal";
   public static final String SCHEMA_URL = "schema.url";

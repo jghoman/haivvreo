@@ -166,7 +166,6 @@ class AvroDeserializer {
   /**
    * Extract either a null or the correct type from a Nullable type.  This is
    * horrible in that we rebuild the TypeInfo every time.
-   * FIXME: Something better than building the damn TypeInfo each time.
    */
   private Object deserializeNullableUnion(Object datum, Schema recordSchema, TypeInfo columnType) throws HaivvreoException {
     int tag = GenericData.get().resolveUnion(recordSchema, datum); // Determine index of value

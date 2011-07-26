@@ -15,7 +15,9 @@
  */
 package com.linkedin.haivvreo;
 
-import java.io.IOException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.HashMap;
 
 /**
@@ -27,6 +29,7 @@ import java.util.HashMap;
  * @param <Instance>  Instance that will be created from SeedObject.
  */
 public abstract class InstanceCache<SeedObject, Instance> {
+  private static final Log LOG = LogFactory.getLog(InstanceCache.class);
   HashMap<Integer, Instance> cache = new HashMap<Integer, Instance>();
   
   public InstanceCache() {}
@@ -36,8 +39,15 @@ public abstract class InstanceCache<SeedObject, Instance> {
    * SeedObject
    */
   public Instance retrieve(SeedObject hv) throws HaivvreoException {
-    if(cache.containsKey(hv.hashCode())) return cache.get(hv.hashCode());
-    
+    if(LOG.isDebugEnabled()) LOG.debug("Checking for hv: " + hv.toString());
+
+    if(cache.containsKey(hv.hashCode())) {
+      if(LOG.isDebugEnabled()) LOG.debug("Returning cache result.");
+      return cache.get(hv.hashCode());
+    }
+
+    if(LOG.isDebugEnabled()) LOG.debug("Creating new instance and storing in cache");
+
     Instance instance = makeInstance(hv);
     cache.put(hv.hashCode(), instance);
     return instance;

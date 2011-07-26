@@ -19,7 +19,11 @@ import org.apache.avro.Schema;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.avro.Schema.Type.*;
 
@@ -27,7 +31,7 @@ import static org.apache.avro.Schema.Type.*;
  * Convert an Avro Schema to a Hive TypeInfo
  */
 class SchemaToTypeInfo {
-   // Conversion of Avro primitive types to Hive primitive types
+  // Conversion of Avro primitive types to Hive primitive types
   // Avro             Hive
   // Null
   // boolean          boolean    check
@@ -88,7 +92,7 @@ class SchemaToTypeInfo {
    * @throws HaivvreoException for any problems during conversion.
    */
   public static TypeInfo generateTypeInfo(Schema schema) throws HaivvreoException {
-    return typeInfoCache.makeInstance(schema);
+    return typeInfoCache.retrieve(schema);
   }
 
   private static TypeInfo generateTypeInfoWorker(Schema schema) throws HaivvreoException {
