@@ -1,5 +1,7 @@
 Haivvreo change log:
 
+1.0.7
+  * Handle multiple schemas during joins in the mapper correctly.
 1.0.6
   * Turn on caching when converting schemas to typeinfos.
   * Close HDFS filesystem instance when finished with it.
