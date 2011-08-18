@@ -163,7 +163,7 @@ class AvroSerializer {
   }
 
   private Object serializedAvroFixed(ListTypeInfo typeInfo, ListObjectInspector fieldOI, Object structFieldData, Schema schema) throws HaivvreoException {
-    return new GenericData.Fixed(extraByteArray(fieldOI, structFieldData));
+    return new GenericData.Fixed(schema, extraByteArray(fieldOI, structFieldData));
   }
 
   // For transforming to BYTES and FIXED, pull out the byte array Avro will want

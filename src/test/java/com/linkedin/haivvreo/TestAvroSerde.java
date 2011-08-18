@@ -135,7 +135,7 @@ public class TestAvroSerde {
     List<? extends StructField> allStructFieldRefs = oi.getAllStructFieldRefs();
     assertEquals(SchemaResolutionProblem.SIGNAL_BAD_SCHEMA.getFields().size(), allStructFieldRefs.size());
     StructField firstField = allStructFieldRefs.get(0);
-    assertTrue(firstField.toString().contains("error-error-error-error-error-error-error"));
+    assertTrue(firstField.toString().contains("error_error_error_error_error_error_error"));
 
     try {
       Writable mock = Mockito.mock(Writable.class);

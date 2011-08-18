@@ -205,7 +205,7 @@ public class TestAvroSerializer {
   @Test
   public void canSerializeFixed() throws SerDeException, IOException {
     String field = "{ \"name\":\"fixed1\", \"type\":{\"type\":\"fixed\", \"name\":\"threebytes\", \"size\":3} }";
-    GenericData.Fixed fixed = new GenericData.Fixed("k9@".getBytes());
+    GenericData.Fixed fixed = new GenericData.Fixed(buildSchema(field), "k9@".getBytes());
     GenericRecord r = serializeAndDeserialize(field, "fixed1", fixed);
 
     assertArrayEquals(fixed.bytes(), ((GenericData.Fixed) r.get("fixed1")).bytes());

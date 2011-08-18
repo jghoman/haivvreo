@@ -305,7 +305,7 @@ public class TestAvroDeserializer {
     GenericData.Record record = new GenericData.Record(s);
 
     byte [] bytes = "ANANCIENTBLUEBOX".getBytes();
-    record.put("hash", new GenericData.Fixed(bytes));
+    record.put("hash", new GenericData.Fixed(s, bytes));
     assertTrue(GENERIC_DATA.validate(s, record));
 
     AvroGenericRecordWritable garw = Utils.serializeAndDeserializeRecord(record);
