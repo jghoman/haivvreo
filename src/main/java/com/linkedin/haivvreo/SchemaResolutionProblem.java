@@ -37,7 +37,11 @@ class SchemaResolutionProblem {
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
-        "            \"name\":\"schema_url\",\n" +
+        "            \"name\":\"schema\",\n" +
+        "            \"type\":\"string\"\n" +
+        "        },\n" +
+        "        {\n" +
+        "            \"name\":\"url\",\n" +
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
@@ -45,7 +49,7 @@ class SchemaResolutionProblem {
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
-        "            \"name\":\"schema_literal\",\n" +
+        "            \"name\":\"literal\",\n" +
         "            \"type\":\"string\"\n" +
         "        }\n" +
         "    ]\n" +
