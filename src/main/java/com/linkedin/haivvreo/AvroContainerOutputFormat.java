@@ -15,7 +15,13 @@
  */
 package com.linkedin.haivvreo;
 
+import static org.apache.avro.file.DataFileConstants.DEFLATE_CODEC;
+import static org.apache.avro.mapred.AvroJob.OUTPUT_CODEC;
+import static org.apache.avro.mapred.AvroOutputFormat.DEFAULT_DEFLATE_LEVEL;
+import static org.apache.avro.mapred.AvroOutputFormat.DEFLATE_LEVEL_KEY;
+
 import org.apache.avro.Schema;
+import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
@@ -50,6 +56,15 @@ public class AvroContainerOutputFormat implements HiveOutputFormat<LongWritable,
     }
     GenericDatumWriter<GenericRecord> gdw = new GenericDatumWriter<GenericRecord>(schema);
     DataFileWriter<GenericRecord> dfw = new DataFileWriter<GenericRecord>(gdw);
+    
+    if (isCompressed) {
+      int level = jobConf.getInt(DEFLATE_LEVEL_KEY, DEFAULT_DEFLATE_LEVEL);
+      String codecName = jobConf.get(OUTPUT_CODEC, DEFLATE_CODEC);
+      CodecFactory factory = codecName.equals(DEFLATE_CODEC)
+          ? CodecFactory.deflateCodec(level)
+          : CodecFactory.fromString(codecName);
+      dfw.setCodec(factory);
+    }
 
     dfw.create(schema, path.getFileSystem(jobConf).create(path));
     return new AvroGenericRecordWriter(dfw);
