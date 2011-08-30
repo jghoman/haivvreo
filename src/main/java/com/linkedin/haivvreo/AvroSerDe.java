@@ -49,8 +49,11 @@ public class AvroSerDe implements SerDe {
     columnTypes = null;
 
     schema =  HaivvreoUtils.determineSchemaOrReturnErrorSchema(properties);
-    configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
-
+    // Configuration is null in some contexts (e.g. TableDesc#getDeserializer)
+    // so we have to be defensive here
+    if (configuration != null) {
+      configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
+    }
     badSchema = schema.equals(SchemaResolutionProblem.SIGNAL_BAD_SCHEMA);
 
     AvroObjectInspectorGenerator aoig = new AvroObjectInspectorGenerator(schema);

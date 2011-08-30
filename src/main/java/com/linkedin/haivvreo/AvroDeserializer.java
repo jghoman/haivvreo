@@ -23,6 +23,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.util.Utf8;
 
 import org.apache.commons.logging.Log;
@@ -65,7 +66,7 @@ class AvroDeserializer {
     public GenericRecord reencode(GenericRecord r, Schema readerSchema) throws HaivvreoException {
       baos.reset();
 
-      BinaryEncoder be = new BinaryEncoder(baos);
+      BinaryEncoder be = EncoderFactory.get().directBinaryEncoder(baos, null);
       gdw.setSchema(r.getSchema());
       try {
         gdw.write(r, be);
