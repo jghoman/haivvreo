@@ -25,6 +25,12 @@
       <organization>LinkedIn</organization>
       <email>jhoman@linkedin.com</email>
     </developer>
+    <developer>
+      <id>tomwhite</id>
+      <name>Tom White</name>
+      <organization>Cloudera</organization>
+      <email>tomwhite@apache.org</email>
+    </developer>
   </developers>
   <organization>
     <name>LinkedIn</name>
