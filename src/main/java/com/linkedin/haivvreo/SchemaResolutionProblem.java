@@ -25,7 +25,7 @@ class SchemaResolutionProblem {
         "    \"type\": \"record\",\n" +
         "    \"fields\": [\n" +
         "        {\n" +
-        "            \"name\":\"ERROR-ERROR-ERROR-ERROR-ERROR-ERROR-ERROR\",\n" +
+        "            \"name\":\"ERROR_ERROR_ERROR_ERROR_ERROR_ERROR_ERROR\",\n" +
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
@@ -33,19 +33,23 @@ class SchemaResolutionProblem {
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
-        "            \"name\":\"check:\",\n" +
+        "            \"name\":\"check\",\n" +
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
-        "            \"name\":\"schema.url:\",\n" +
+        "            \"name\":\"schema\",\n" +
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
-        "            \"name\":\"and:\",\n" +
+        "            \"name\":\"url\",\n" +
         "            \"type\":\"string\"\n" +
         "        },\n" +
         "        {\n" +
-        "            \"name\":\"schema.literal:\",\n" +
+        "            \"name\":\"and\",\n" +
+        "            \"type\":\"string\"\n" +
+        "        },\n" +
+        "        {\n" +
+        "            \"name\":\"literal\",\n" +
         "            \"type\":\"string\"\n" +
         "        }\n" +
         "    ]\n" +

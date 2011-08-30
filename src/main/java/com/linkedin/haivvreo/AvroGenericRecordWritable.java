@@ -24,6 +24,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.EncoderFactory;
 import org.apache.hadoop.io.Writable;
 
 import java.io.*;
@@ -65,7 +66,7 @@ public class AvroGenericRecordWritable implements Writable{
 
     // Write record to byte buffer
     GenericDatumWriter<GenericRecord> gdw = new GenericDatumWriter<GenericRecord>();
-    BinaryEncoder be = new BinaryEncoder((DataOutputStream)out);
+    BinaryEncoder be = EncoderFactory.get().directBinaryEncoder((DataOutputStream)out, null);
 
     gdw.setSchema(record.getSchema());
     gdw.write(record, be);
