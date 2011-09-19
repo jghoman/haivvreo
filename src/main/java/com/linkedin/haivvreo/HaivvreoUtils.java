@@ -93,7 +93,6 @@ class HaivvreoUtils {
       return s;
     } finally {
       if(in != null) in.close();
-      if(fs != null) fs.close();
     }
   }
 
