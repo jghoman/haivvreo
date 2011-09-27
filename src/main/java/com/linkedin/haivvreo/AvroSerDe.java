@@ -53,6 +53,8 @@ public class AvroSerDe implements SerDe {
     // so we have to be defensive here
     if (configuration != null) {
       configuration.set(HAIVVREO_SCHEMA, schema.toString(false));
+      // force output files to have a .avro extension
+      configuration.set("hive.output.file.extension", ".avro");
     }
     badSchema = schema.equals(SchemaResolutionProblem.SIGNAL_BAD_SCHEMA);
 
