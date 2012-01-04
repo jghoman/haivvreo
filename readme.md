@@ -224,7 +224,7 @@ Hive tends to swallow exceptions from Haivvreo that occur before job submission.
 
 FAQ
 ---
-* Why do I get **error-error-error-error-error-error-error** and a message to check schema.literal and schema.url when describing a table or ruinning a query against a table?
+* Why do I get **error-error-error-error-error-error-error** and a message to check schema.literal and schema.url when describing a table or running a query against a table?
 
 > Haivvreo returns this message when it has trouble finding or parsing the schema provided by either the schema.literal or schema.url value.  It is unable to be more specific because Hive expects all calls to the serde config methods to be successful, meaning we are unable to return an actual exception.   By signaling an error via this message, the table is left in a good state and the incorrect value can be corrected with a call to *alter table T set serdeproperties*.
 
