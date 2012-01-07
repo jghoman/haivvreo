@@ -75,10 +75,10 @@ class HaivvreoUtils {
     try {
       return determineSchemaOrThrowException(props);
     } catch(HaivvreoException he) {
-      LOG.warn("Encountered HaivvreoException determing schema. Returning signal schema to indicate problem", he);
+      LOG.warn("Encountered HaivvreoException determining schema. Returning signal schema to indicate problem", he);
       return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
     } catch (Exception e) {
-      LOG.warn("Encountered exception determing schema. Returning signal schema to indicate problem", e);
+      LOG.warn("Encountered exception determining schema. Returning signal schema to indicate problem", e);
       return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
     }
   }
