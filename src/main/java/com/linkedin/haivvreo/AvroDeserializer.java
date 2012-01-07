@@ -115,7 +115,7 @@ class AvroDeserializer {
 
     // Check if we're working with an evolved schema
     if(!r.getSchema().equals(readerSchema)) {
-      LOG.info("Received different schemas.  Have to re-encode: " + r.getSchema().toString(false));
+      LOG.debug("Received different schemas.  Have to re-encode: " + r.getSchema().toString(false));
       if(reEncoder == null) reEncoder = new SchemaReEncoder();
       r = reEncoder.reencode(r, readerSchema);
     }
