@@ -16,25 +16,6 @@
 package com.linkedin.haivvreo;
 
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.BinaryDecoder;
-import org.apache.avro.io.BinaryEncoder;
-import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.util.Utf8;
-
-import org.apache.hadoop.hive.serde2.objectinspector.StandardUnionObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.*;
-import org.apache.hadoop.io.Writable;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Simple pair class used for memoizing schema-reencoding operations.
