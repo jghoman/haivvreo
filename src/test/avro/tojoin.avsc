@@ -1,0 +1,9 @@
+{
+  "namespace": "com.linkedin.haivvreo",
+  "name": "tojoin",
+  "type": "record",
+  "fields": [
+    { "name":"string1", "type":"string" },
+    { "name":"int1", "type":"int" }
+
+  ] }
