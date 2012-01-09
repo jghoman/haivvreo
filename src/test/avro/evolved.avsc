@@ -1,8 +1,0 @@
-{
-  "namespace": "com.linkedin.haivvreo",
-  "name": "blinky",
-  "type": "record",
-  "fields": [
-    { "name":"string1", "type":"string" },
-    { "name":"string2", "type":"string", "default":"this is the default value" }
-  ] }
