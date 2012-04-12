@@ -44,6 +44,10 @@
     </plugins>
   </build>
 
+  <properties>
+    <hive.version>0.8.1</hive.version>
+  </properties>
+
   <repositories>
     <repository>
       <id>maven</id>
@@ -87,8 +91,15 @@
       <name>www.apache.org</name>
       <url>https://repository.apache.org/content/repositories/releases</url>
     </repository>
+    <repository>
+      <!-- hive 8 brings in datanucleus via this repo -->
+      <id>datanucleus</id>
+      <name>datanucleus</name>
+      <url>http://www.datanucleus.org/downloads/maven2/</url>
+    </repository>
   </repositories>
   <dependencies>
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
@@ -98,7 +109,12 @@
     <dependency>
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-serde</artifactId>
-      <version>0.7.1-SNAPSHOT</version>
+      <version>${hive.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-exec</artifactId>
+      <version>${hive.version}</version>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
@@ -114,11 +130,6 @@
           <artifactId>jmxtools</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hive</groupId>
-      <artifactId>hive-exec</artifactId>
-      <version>0.7.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
