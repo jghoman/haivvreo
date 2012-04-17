@@ -83,7 +83,7 @@ public class AvroSerDe implements SerDe {
   // Also, in join queries, multiple properties will be included, so we need
   // to extract out the one appropriate to the table we're serde'ing.
   private Properties determineCorrectProperties(Configuration configuration, Properties properties) {
-    if((configuration instanceof JobConf) && (Utilities.getHiveJobID(configuration) != null)) {
+    if((configuration instanceof JobConf) && HaivvreoUtils.insideMRJob((JobConf) configuration)) {
       LOG.info("In MR job, extracting table-level properties");
       MapredWork mapRedWork = Utilities.getMapRedWork(configuration);
       LinkedHashMap<String,PartitionDesc> a = mapRedWork.getAliasToPartnInfo();
