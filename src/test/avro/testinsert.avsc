@@ -1,0 +1,28 @@
+{
+  "namespace": "com.linkedin.haivvreo",
+  "name": "testinsert",
+  "doc": "can we insert from a joined query",
+  "type": "record",
+  "fields": [
+    {
+      "name":"string1",
+      "type":"string",
+      "doc":"this field is string1"
+    },
+    {
+      "name":"string2",
+      "type":"string",
+      "doc":"this field is string2"
+    },
+    {
+      "name":"int1",
+      "type":"int",
+      "doc":"this field is int1"
+    },
+    {
+      "name":"int2",
+      "type":"int",
+      "doc":"this field is int2"
+    }
+  ]
+}
