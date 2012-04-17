@@ -22,6 +22,10 @@ Requirements
 ------------
 Haivvreo has been built and tested against Hive 0.7 and Avro 1.4.1.  Its build script is built on Maven 3.
 
+Note about branches
+-------------------
+Currently there are two branches, master and avro14, for Avro 1.6 and Avro 1.4, respectively.  These branches will be marged into a single new master that supports both versions of Avro soon.
+
 Building and deploying
 ----------------------
 Once the jar has been has been built via maven, it and Avro and Avro's transitive dependencies (avro-1.4.1.jar, jackson-core-asl-1.4.2.jar, jackson-mapper-asl-1.4.2.jar) should be made available to Hive either by placing them in the cluster's lib folders or by pointing [HIVE_AUX_JARS_PATH](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration) to a location with them.
