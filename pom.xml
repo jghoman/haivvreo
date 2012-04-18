@@ -100,7 +100,13 @@
     </repository>
   </repositories>
   <dependencies>
-
+    <!-- Hadoop has an undeclared Jersy dependency from webhdfs -->
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
