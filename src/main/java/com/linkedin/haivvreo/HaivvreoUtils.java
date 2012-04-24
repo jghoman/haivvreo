@@ -22,6 +22,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.ql.exec.Utilities;
+import org.apache.hadoop.mapred.JobConf;
 
 import java.io.IOException;
 import java.net.URL;
@@ -75,10 +78,10 @@ class HaivvreoUtils {
     try {
       return determineSchemaOrThrowException(props);
     } catch(HaivvreoException he) {
-      LOG.warn("Encountered HaivvreoException determing schema. Returning signal schema to indicate problem", he);
+      LOG.warn("Encountered HaivvreoException determining schema. Returning signal schema to indicate problem", he);
       return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
     } catch (Exception e) {
-      LOG.warn("Encountered exception determing schema. Returning signal schema to indicate problem", e);
+      LOG.warn("Encountered exception determining schema. Returning signal schema to indicate problem", e);
       return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
     }
   }
@@ -118,5 +121,17 @@ class HaivvreoUtils {
     List<Schema> types = schema.getTypes();
 
     return types.get(0).getType().equals(Schema.Type.NULL) ? types.get(1) : types.get(0);
+  }
+
+  /**
+   * Determine if we're being executed from within an MR job or as part
+   * of a select * statement.  The signals for this varies between Hive versions.
+   * @param job that contains things that are or are not set in a job
+   * @return Are we in a job or not?
+   */
+  static boolean insideMRJob(JobConf job) {
+    return job != null
+           && (HiveConf.getVar(job, HiveConf.ConfVars.PLAN) != null)
+           && (!HiveConf.getVar(job, HiveConf.ConfVars.PLAN).isEmpty());
   }
 }

@@ -74,14 +74,8 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
    * @throws HaivvreoException
    */
   private Schema getSchema(JobConf job, FileSplit split) throws HaivvreoException, IOException {
-    // In "select * from table" situations (non-MR), Haivvreo can add things to the job
-    // It's safe to add this to the job since it's not *actually* a mapred job.
-    // Here the global state is confined to just this process.
-    String s = job.get(AvroSerDe.HAIVVREO_SCHEMA);
-    if(s != null) return Schema.parse(s);
-
     // Inside of a MR job, we can pull out the actual properties
-    if(Utilities.getHiveJobID(job) != null) {
+    if(HaivvreoUtils.insideMRJob(job)) {
       MapredWork mapRedWork = Utilities.getMapRedWork(job);
 
       // Iterate over the Path -> Partition descriptions to find the partition
@@ -99,6 +93,15 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
         }
       }
       if(LOG.isInfoEnabled()) LOG.info("Unable to match filesplit " + split + " with a partition.");
+    }
+
+    // In "select * from table" situations (non-MR), Haivvreo can add things to the job
+    // It's safe to add this to the job since it's not *actually* a mapred job.
+    // Here the global state is confined to just this process.
+    String s = job.get(AvroSerDe.HAIVVREO_SCHEMA);
+    if(s != null) {
+      LOG.info("Found the avro schema in the job: " + s);
+      return Schema.parse(s);
     }
     // No more places to get the schema from. Give up.  May have to re-encode later.
     return null;

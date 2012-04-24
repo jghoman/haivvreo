@@ -1,5 +1,7 @@
 Haivvreo change log:
 
+1.0.8
+  * Handle evolved (and/or multiple schemas) correctly.
 1.0.7
   * Handle multiple schemas during joins in the mapper correctly.
 1.0.6
