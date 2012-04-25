@@ -23,6 +23,8 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.mapred.FsInput;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.plan.MapredWork;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
@@ -74,6 +76,7 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
    * @throws HaivvreoException
    */
   private Schema getSchema(JobConf job, FileSplit split) throws HaivvreoException, IOException {
+    FileSystem fs = split.getPath().getFileSystem(job);
     // Inside of a MR job, we can pull out the actual properties
     if(HaivvreoUtils.insideMRJob(job)) {
       MapredWork mapRedWork = Utilities.getMapRedWork(job);
@@ -82,7 +85,7 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
       // that matches our input split.
       for (Map.Entry<String,PartitionDesc> pathsAndParts: mapRedWork.getPathToPartitionInfo().entrySet()){
         String partitionPath = pathsAndParts.getKey();
-        if(pathIsInPartition(split, partitionPath)) {
+        if(pathIsInPartition(split.getPath().makeQualified(fs), partitionPath)) {
           if(LOG.isInfoEnabled()) LOG.info("Matching partition " + partitionPath + " with input split " + split);
 
           Properties props = pathsAndParts.getValue().getProperties();
@@ -107,8 +110,8 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
     return null;
   }
 
-  private boolean pathIsInPartition(FileSplit split, String partitionPath) {
-    return split.getPath().toString().startsWith(partitionPath);
+  private boolean pathIsInPartition(Path split, String partitionPath) {
+    return split.toString().startsWith(partitionPath);
   }
 
 
