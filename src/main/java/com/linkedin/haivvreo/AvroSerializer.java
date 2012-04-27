@@ -41,10 +41,10 @@ class AvroSerializer {
   // handle mismatches with null.  We don't have that option, so instead we'll
   // end up throwing an exception for invalid records.
   public Writable serialize(Object o, ObjectInspector objectInspector, List<String> columnNames, List<TypeInfo> columnTypes, Schema schema) throws HaivvreoException {
-    StructObjectInspector ssoi = (StructObjectInspector) objectInspector;
+    StructObjectInspector soi = (StructObjectInspector) objectInspector;
     GenericData.Record record = new GenericData.Record(schema);
 
-    List<? extends StructField> outputFieldRefs = ssoi.getAllStructFieldRefs();
+    List<? extends StructField> outputFieldRefs = soi.getAllStructFieldRefs();
     if(outputFieldRefs.size() != columnNames.size())
       throw new HaivvreoException("Number of input columns was different than output columns (in = " + columnNames.size() + " vs out = " + outputFieldRefs.size());
 
@@ -52,8 +52,8 @@ class AvroSerializer {
     if(outputFieldRefs.size() != size) // Hive does this check for us, so we should be ok.
       throw new HaivvreoException("Hive passed in a different number of fields than the schema expected: (Hive wanted " + outputFieldRefs.size() +", Avro expected " + schema.getFields().size());
 
-    List<? extends StructField> allStructFieldRefs = ssoi.getAllStructFieldRefs();
-    List<Object> structFieldsDataAsList = ssoi.getStructFieldsDataAsList(o);
+    List<? extends StructField> allStructFieldRefs = soi.getAllStructFieldRefs();
+    List<Object> structFieldsDataAsList = soi.getStructFieldsDataAsList(o);
 
     for(int i  = 0; i < size; i++) {
       Field field = schema.getFields().get(i);
