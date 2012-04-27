@@ -41,7 +41,7 @@ class AvroSerializer {
   // handle mismatches with null.  We don't have that option, so instead we'll
   // end up throwing an exception for invalid records.
   public Writable serialize(Object o, ObjectInspector objectInspector, List<String> columnNames, List<TypeInfo> columnTypes, Schema schema) throws HaivvreoException {
-    StandardStructObjectInspector ssoi = (StandardStructObjectInspector) objectInspector;
+    StructObjectInspector ssoi = (StructObjectInspector) objectInspector;
     GenericData.Record record = new GenericData.Record(schema);
 
     List<? extends StructField> outputFieldRefs = ssoi.getAllStructFieldRefs();
