@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.serde2.SerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
+import org.apache.hadoop.hive.serde2.SerDeStats;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.Writable;
@@ -138,6 +139,12 @@ public class AvroSerDe implements SerDe {
   @Override
   public ObjectInspector getObjectInspector() throws SerDeException {
     return oi;
+  }
+
+  @Override
+  public SerDeStats getSerDeStats() {
+    // No support for statistics. That seems to be a popular answer.
+    return null;
   }
 
   private AvroDeserializer getDeserializer() {
