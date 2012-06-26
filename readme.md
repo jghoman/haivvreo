@@ -1,3 +1,7 @@
+NOTE
+====
+Haivvreo is now directly in Hive as of [HIVE-895](https://issues.apache.org/jira/browse/HIVE-895).  All future bug reports should go there and fixes will be backported to here time permitting (which it usually doesn't).
+
 Hive + Avro = Haivvreo: Putting Avro into Hive
 ==============================================
 
