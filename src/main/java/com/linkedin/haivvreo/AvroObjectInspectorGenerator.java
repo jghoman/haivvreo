@@ -21,7 +21,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.*;
+import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.UnionTypeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +41,7 @@ import java.util.List;
 class AvroObjectInspectorGenerator {
   final private List<String> columnNames;
   final private List<TypeInfo> columnTypes;
+  final private List<String> columnComments;
   final private ObjectInspector oi;
 
   public AvroObjectInspectorGenerator(Schema schema) throws SerDeException {
@@ -43,6 +49,7 @@ class AvroObjectInspectorGenerator {
 
     this.columnNames = generateColumnNames(schema);
     this.columnTypes = SchemaToTypeInfo.generateColumnTypes(schema);
+    this.columnComments = generateColumnComments(schema);
     assert columnNames.size() == columnTypes.size();
     this.oi = createObjectInspector();
   }
@@ -61,6 +68,10 @@ class AvroObjectInspectorGenerator {
     return columnTypes;
   }
 
+  public List<String> getColumnComments() {
+    return columnComments;
+  }
+
   public ObjectInspector getObjectInspector() {
     return oi;
   }
@@ -72,7 +83,8 @@ class AvroObjectInspectorGenerator {
     for(int i = 0; i < columnNames.size(); i++) {
       columnOIs.add(i, createObjectInspectorWorker(columnTypes.get(i)));
     }
-    return ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
+
+    return ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs, columnComments);
   }
 
   private ObjectInspector createObjectInspectorWorker(TypeInfo ti) throws SerDeException {
@@ -144,4 +156,16 @@ class AvroObjectInspectorGenerator {
     return fieldsList;
   }
 
+  private List<String> generateColumnComments(Schema schema) {
+    List<Schema.Field> fields = schema.getFields();
+    List<String> comments = new ArrayList<String>(fields.size());
+
+    for (Schema.Field field : fields) {
+      String comment = field.doc();
+      if(comment == null) comment = "";
+      comments.add(comment);
+    }
+
+    return comments;
+  }
 }
