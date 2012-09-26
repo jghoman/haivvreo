@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import org.apache.hadoop.conf.Configuration;
+import java.util.Properties;
+import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 
 import static org.junit.Assert.*;
 
@@ -403,4 +406,117 @@ public class TestAvroDeserializer {
     else
       assertEquals("this is a string", soi.getPrimitiveJavaObject(rowElement));
   }
+
+  @Test
+  public void canDeserializeColumnsSelectively() throws SerDeException, IOException {
+    String LOCALRECORD_SCHEMA = "{\n" +
+      "  \"namespace\": \"testing.test.mctesty\",\n" +
+      "  \"name\": \"oneRecord\",\n" +
+      "  \"type\": \"record\",\n" +
+      "  \"fields\": [\n" +
+      "    {\n" +
+      "      \"name\":\"string1\",\n" +
+      "      \"type\":\"string\"\n" +
+      "    },\n" +
+      "    {\n" +
+      "      \"name\":\"string2\",\n" +
+      "      \"type\":\"string\"\n" +
+      "    },\n" +
+      "    {\n" +
+      "      \"name\":\"int1\",\n" +
+      "      \"type\":\"int\"\n" +
+      "    },\n" +
+      "    {\n" +
+      "      \"name\":\"aRecord\",\n" +
+      "      \"type\":{\"type\":\"record\",\n" +
+      "              \"name\":\"recordWithinARecord\",\n" +
+      "              \"fields\": [\n" +
+      "                 {\n" +
+      "                  \"name\":\"int1\",\n" +
+      "                  \"type\":\"int\"\n" +
+      "                },\n" +
+      "                {\n" +
+      "                  \"name\":\"boolean1\",\n" +
+      "                  \"type\":\"boolean\"\n" +
+      "                },\n" +
+      "                {\n" +
+      "                  \"name\":\"long1\",\n" +
+      "                  \"type\":\"long\"\n" +
+      "                }\n" +
+      "      ]}\n" +
+      "    }\n" +
+      "  ]\n" +
+      "}";
+    
+    Schema s = Schema.parse(LOCALRECORD_SCHEMA);
+    GenericData.Record record = new GenericData.Record(s);
+
+    record.put("string1", "Wandered Aimlessly");
+    record.put("string2", "as a cloud");
+    record.put("int1", 555);
+
+    GenericData.Record innerRecord = new GenericData.Record(s.getField("aRecord").schema());
+    innerRecord.put("int1", 42);
+    innerRecord.put("boolean1", true);
+    innerRecord.put("long1", 42432234234l);
+    record.put("aRecord", innerRecord);
+
+    assertTrue(GENERIC_DATA.validate(s, record));
+
+    AvroGenericRecordWritable garw = Utils.serializeAndDeserializeRecord(record);
+
+    AvroObjectInspectorGenerator aoig = new AvroObjectInspectorGenerator(s);
+
+    AvroSerDe des = new AvroSerDe();
+    Configuration hconf = new Configuration();
+    Properties props = new Properties();
+    props.put(HaivvreoUtils.SCHEMA_LITERAL, LOCALRECORD_SCHEMA);
+
+    ArrayList<Integer> queryCols = new ArrayList<Integer>();
+    queryCols.add(3);
+    queryCols.add(1);
+    queryCols.add(1);
+    queryCols.add(3);
+    queryCols.add(1);
+    ColumnProjectionUtils.appendReadColumnIDs(hconf, queryCols);
+    
+    
+    // Initialize deserializer
+    des.initialize(hconf, props);
+    
+    ArrayList<Object> row = (ArrayList<Object>)des.deserialize(garw);
+    assertEquals(4, row.size());
+
+    Object stringObj = row.get(1);
+    assertEquals(stringObj, "as a cloud");
+
+    Object theRecordObject = row.get(3);
+    System.out.println("theRecordObject = " + theRecordObject.getClass().getCanonicalName());
+
+    Object theIntObject = row.get(2);
+    assertEquals(theIntObject, null);
+
+    // The original record was lost in the deserialization, so just go the correct way, through objectinspectors
+    StandardStructObjectInspector oi = (StandardStructObjectInspector)aoig.getObjectInspector();
+    List<? extends StructField> allStructFieldRefs = oi.getAllStructFieldRefs();
+    assertEquals(4, allStructFieldRefs.size());
+    StructField fieldRefForaRecord = allStructFieldRefs.get(3);
+    assertEquals("arecord", fieldRefForaRecord.getFieldName());
+    Object innerRecord2 = oi.getStructFieldData(row, fieldRefForaRecord); // <--- use this!
+
+    // Extract innerRecord field refs
+    StandardStructObjectInspector innerRecord2OI = (StandardStructObjectInspector) fieldRefForaRecord.getFieldObjectInspector();
+
+    List<? extends StructField> allStructFieldRefs1 = innerRecord2OI.getAllStructFieldRefs();
+    assertEquals(3, allStructFieldRefs1.size());
+    assertEquals("int1", allStructFieldRefs1.get(0).getFieldName());
+    assertEquals("boolean1", allStructFieldRefs1.get(1).getFieldName());
+    assertEquals("long1", allStructFieldRefs1.get(2).getFieldName());
+
+    innerRecord2OI.getStructFieldsDataAsList(innerRecord2);
+    assertEquals(42, innerRecord2OI.getStructFieldData(innerRecord2, allStructFieldRefs1.get(0)));
+    assertEquals(true, innerRecord2OI.getStructFieldData(innerRecord2, allStructFieldRefs1.get(1)));
+    assertEquals(42432234234l, innerRecord2OI.getStructFieldData(innerRecord2, allStructFieldRefs1.get(2)));
+  }
+
 }

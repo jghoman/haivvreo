@@ -41,6 +41,18 @@ import java.util.Map;
 
 class AvroDeserializer {
   private static final Log LOG = LogFactory.getLog(AvroDeserializer.class);
+  
+  private boolean logColumnsRequested = true;    
+  List<Integer> queryCols = null;
+  private long recordCount =0;
+  private long reEncodeTime = 0;
+  private long optimRecordCount =0;
+  private long deserializeTime=0;
+  
+  public void  setQueryCols(List<Integer> qCols) {
+    this.queryCols = qCols;
+  }
+
   /**
    * When encountering a record with an older schema than the one we're trying
    * to read, it is necessary to re-encode with a reader against the newer schema.
@@ -113,28 +125,58 @@ class AvroDeserializer {
     AvroGenericRecordWritable recordWritable = (AvroGenericRecordWritable) writable;
     GenericRecord r = recordWritable.getRecord();
 
+    long st = System.nanoTime();
     // Check if we're working with an evolved schema
     if(!r.getSchema().equals(readerSchema)) {
       LOG.warn("Received different schemas.  Have to re-encode: " + r.getSchema().toString(false));
       if(reEncoder == null) reEncoder = new SchemaReEncoder();
       r = reEncoder.reencode(r, readerSchema);
+      long et = System.nanoTime();
+      reEncodeTime += et-st;
     }
 
-    workerBase(row, columnNames, columnTypes, r);
+    recordCount++;
+    workerBase(row, columnNames, columnTypes, r, true);
+
+    if (recordCount % 10000 == 0)
+      LOG.info("processed " + recordCount + " records " + "optimized: " + optimRecordCount +"reencode time=" + reEncodeTime/1000 + "reader schema: " + readerSchema);
     return row;
   }
 
+  // Returns true iff the colid is needed by the query.
+  private boolean isNeededColumn(boolean topLevel, int curIdx, int colId){
+    if (!topLevel || queryCols == null ||
+	(curIdx < queryCols.size() && queryCols.get(curIdx) == colId))
+      return true;
+    return false;
+  }
+
   // The actual deserialization may involve nested records, which require recursion.
-  private List<Object> workerBase(List<Object> objectRow, List<String> columnNames, List<TypeInfo> columnTypes, GenericRecord record) throws HaivvreoException {
+  private List<Object> workerBase(List<Object> objectRow, List<String> columnNames, List<TypeInfo> columnTypes, GenericRecord record, boolean topLevel) throws HaivvreoException {
+    
+    int idx =0;
+    if (topLevel && queryCols != null)
+      optimRecordCount++;
     for(int i = 0; i < columnNames.size(); i++) {
       TypeInfo columnType = columnTypes.get(i);
       String columnName = columnNames.get(i);
-      Object datum = record.get(columnName);
-      Schema datumSchema = record.getSchema().getField(columnName).schema();
-
-      objectRow.add(worker(datum, datumSchema, columnType));
+      if(isNeededColumn(topLevel, idx, i))
+      {
+        // This column was requested in query columns, so process it
+	Object datum = record.get(columnName);
+	Schema datumSchema = record.getSchema().getField(columnName).schema();
+	if(logColumnsRequested && topLevel && queryCols != null) {
+	  LOG.debug("Haivvreo DEBUG: ColumnAsked is:" + columnName + " Query cols size: " + queryCols.size() + " Columns Size:  " + columnNames.size() + ":counter:" + i + " index " + idx);
+	}
+	objectRow.add(worker(datum, datumSchema, columnType));
+	idx++;
+      } else {
+	objectRow.add(null);
+      }
     }
-
+    if(topLevel) {
+      logColumnsRequested = false;     
+    }
     return objectRow;
   }
 
@@ -182,7 +224,7 @@ class AvroDeserializer {
     ArrayList<String> innerFieldNames = columnType.getAllStructFieldNames();
     List<Object> innerObjectRow = new ArrayList<Object>(innerFieldTypes.size());
 
-    return workerBase(innerObjectRow, innerFieldNames, innerFieldTypes, datum);
+    return workerBase(innerObjectRow, innerFieldNames, innerFieldTypes, datum, false);
   }
 
   private Object deserializeUnion(Object datum, Schema recordSchema, UnionTypeInfo columnType) throws HaivvreoException {

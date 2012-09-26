@@ -1,0 +1,16 @@
+dist
+target
+*.iml
+*.ipr
+*.iws
+*.tar.gz
+*.swp
+*.swo
+.project
+.settings/
+**/.classpath
+**/.project
+**/.settings/
+.externalToolBuilders/
+build
+.classpath*

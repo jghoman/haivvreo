@@ -28,6 +28,7 @@ import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeStats;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.JobConf;
 
@@ -35,13 +36,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Read or write Avro data from Hive.
  */
 public class AvroSerDe implements SerDe {
   private static final Log LOG = LogFactory.getLog(AvroSerDe.class);
-
+  private static final String COLSELECTIVE_SERDE="haivvreo.colselective";
   public static final String HAIVVREO_SCHEMA = "haivvreo.schema";
   private ObjectInspector oi;
   private List<String> columnNames;
@@ -51,6 +54,7 @@ public class AvroSerDe implements SerDe {
   private AvroSerializer avroSerializer = null;
 
   private boolean badSchema = false;
+   private List<Integer> readColumnArray = null;
 
   @Override
   public void initialize(Configuration configuration, Properties properties) throws SerDeException {
@@ -78,7 +82,41 @@ public class AvroSerDe implements SerDe {
     this.columnNames = aoig.getColumnNames();
     this.columnTypes = aoig.getColumnTypes();
     this.oi = aoig.getObjectInspector();
+    generateReadColumnArray(configuration, properties);
   }
+
+  private void generateReadColumnArray(Configuration configuration, Properties properties)
+  {
+    this.readColumnArray = null;  
+    if (configuration != null)
+    {
+      String tableName = "";
+      if (properties != null) 
+	tableName = properties.getProperty("name");
+      this.readColumnArray = ColumnProjectionUtils.getReadColumnIDs(configuration);
+      LOG.debug("Haivvreo DEBUG: Hive Column Projection vector for table " + tableName + " "+ this.readColumnArray.toString());
+      // For "Select *" type queries, the column array comes in empty. handle
+      // this similar to the case where optimization is disabled.
+      if (this.readColumnArray.size()==0)
+	this.readColumnArray= null;
+    }
+    if (this.readColumnArray == null) return;
+    // sort and eliminate duplicates
+    Collections.sort(this.readColumnArray);
+    // Handle possible repeated values in the array which Hive code passes to us
+    ArrayList<Integer> qCols = new ArrayList<Integer>();
+    Integer prevqc  = new Integer(-1);
+    for (Integer qc: this.readColumnArray){
+      if (qc != prevqc)
+	qCols.add(qc);
+      prevqc = qc;
+    }
+      
+    this.readColumnArray = qCols;
+    LOG.debug("Haivvreo DEBUG: Final Column Projection Vector "+this.readColumnArray.toString());
+  }
+
+
 
   // Hive passes different properties in at different times.  If we're in a MR job,
   // we'll get properties for the partition rather than the table, which will give
@@ -146,8 +184,10 @@ public class AvroSerDe implements SerDe {
   }
 
   private AvroDeserializer getDeserializer() {
-    if(avroDeserializer == null) avroDeserializer = new AvroDeserializer();
-
+    if(avroDeserializer == null) {
+      avroDeserializer = new AvroDeserializer();
+      avroDeserializer.setQueryCols(readColumnArray);
+    }
     return avroDeserializer;
   }
 
