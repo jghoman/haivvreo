@@ -48,6 +48,7 @@ class AvroDeserializer {
   private long reEncodeTime = 0;
   private long optimRecordCount =0;
   private long deserializeTime=0;
+  private static long TIMER_LOG_BATCH_SIZE=10000;
   
   public void  setQueryCols(List<Integer> qCols) {
     this.queryCols = qCols;
@@ -138,15 +139,15 @@ class AvroDeserializer {
     recordCount++;
     workerBase(row, columnNames, columnTypes, r, true);
 
-    if (recordCount % 10000 == 0)
-      LOG.info("processed " + recordCount + " records " + "optimized: " + optimRecordCount +"reencode time=" + reEncodeTime/1000 + "reader schema: " + readerSchema);
+    if (recordCount % TIMER_LOG_BATCH_SIZE == 0)
+      LOG.info("Processed " + recordCount + " records " + "optimized: " + optimRecordCount +" reencode time=" + reEncodeTime/1000 + "reader schema: " + readerSchema);
     return row;
   }
 
   // Returns true iff the colid is needed by the query.
   private boolean isNeededColumn(boolean topLevel, int curIdx, int colId){
     if (!topLevel || queryCols == null ||
-	(curIdx < queryCols.size() && queryCols.get(curIdx) == colId))
+        (curIdx < queryCols.size() && queryCols.get(curIdx) == colId))
       return true;
     return false;
   }
@@ -160,18 +161,17 @@ class AvroDeserializer {
     for(int i = 0; i < columnNames.size(); i++) {
       TypeInfo columnType = columnTypes.get(i);
       String columnName = columnNames.get(i);
-      if(isNeededColumn(topLevel, idx, i))
-      {
+      if(isNeededColumn(topLevel, idx, i)) {
         // This column was requested in query columns, so process it
-	Object datum = record.get(columnName);
-	Schema datumSchema = record.getSchema().getField(columnName).schema();
-	if(logColumnsRequested && topLevel && queryCols != null) {
-	  LOG.debug("Haivvreo DEBUG: ColumnAsked is:" + columnName + " Query cols size: " + queryCols.size() + " Columns Size:  " + columnNames.size() + ":counter:" + i + " index " + idx);
-	}
-	objectRow.add(worker(datum, datumSchema, columnType));
-	idx++;
+        Object datum = record.get(columnName);
+        Schema datumSchema = record.getSchema().getField(columnName).schema();
+        if(logColumnsRequested && topLevel && queryCols != null) {
+          LOG.debug("Haivvreo DEBUG: ColumnAsked is:" + columnName + " Query cols size: " + queryCols.size() + " Columns Size:  " + columnNames.size() + ":counter:" + i + " index " + idx);
+        }
+        objectRow.add(worker(datum, datumSchema, columnType));
+        idx++;
       } else {
-	objectRow.add(null);
+        objectRow.add(null);
       }
     }
     if(topLevel) {

@@ -54,7 +54,7 @@ public class AvroSerDe implements SerDe {
   private AvroSerializer avroSerializer = null;
 
   private boolean badSchema = false;
-   private List<Integer> readColumnArray = null;
+  private List<Integer> readColumnArray = null;
 
   @Override
   public void initialize(Configuration configuration, Properties properties) throws SerDeException {
@@ -85,20 +85,18 @@ public class AvroSerDe implements SerDe {
     generateReadColumnArray(configuration, properties);
   }
 
-  private void generateReadColumnArray(Configuration configuration, Properties properties)
-  {
+  private void generateReadColumnArray(Configuration configuration, Properties properties) {
     this.readColumnArray = null;  
-    if (configuration != null)
-    {
+    if (configuration != null){
       String tableName = "";
       if (properties != null) 
-	tableName = properties.getProperty("name");
+        tableName = properties.getProperty("name");
       this.readColumnArray = ColumnProjectionUtils.getReadColumnIDs(configuration);
-      LOG.debug("Haivvreo DEBUG: Hive Column Projection vector for table " + tableName + " "+ this.readColumnArray.toString());
+      LOG.info("Haivvreo : Hive Column Projection vector for table " + tableName + " "+ this.readColumnArray.toString());
       // For "Select *" type queries, the column array comes in empty. handle
       // this similar to the case where optimization is disabled.
       if (this.readColumnArray.size()==0)
-	this.readColumnArray= null;
+        this.readColumnArray= null;
     }
     if (this.readColumnArray == null) return;
     // sort and eliminate duplicates
@@ -108,12 +106,11 @@ public class AvroSerDe implements SerDe {
     Integer prevqc  = new Integer(-1);
     for (Integer qc: this.readColumnArray){
       if (qc != prevqc)
-	qCols.add(qc);
+        qCols.add(qc);
       prevqc = qc;
     }
-      
     this.readColumnArray = qCols;
-    LOG.debug("Haivvreo DEBUG: Final Column Projection Vector "+this.readColumnArray.toString());
+    LOG.info("Haivvreo Final Column Projection Vector "+this.readColumnArray.toString());
   }
 
 
