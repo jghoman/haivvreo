@@ -183,7 +183,7 @@ public class AvroSerDe implements SerDe {
   private AvroDeserializer getDeserializer() {
     if(avroDeserializer == null) {
       avroDeserializer = new AvroDeserializer();
-      avroDeserializer.setQueryCols(readColumnArray);
+      avroDeserializer.setReadColumnArray(readColumnArray);
     }
     return avroDeserializer;
   }

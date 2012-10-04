@@ -43,15 +43,15 @@ class AvroDeserializer {
   private static final Log LOG = LogFactory.getLog(AvroDeserializer.class);
   
   private boolean logColumnsRequested = true;    
-  List<Integer> queryCols = null;
+  List<Integer> readColumnArray = null;
   private long recordCount =0;
   private long reEncodeTime = 0;
   private long optimRecordCount =0;
   private long deserializeTime=0;
   private static long TIMER_LOG_BATCH_SIZE=10000;
   
-  public void  setQueryCols(List<Integer> qCols) {
-    this.queryCols = qCols;
+  public void  setReadColumnArray(List<Integer> rColumnArray) {
+    this.readColumnArray = rColumnArray;
   }
 
   /**
@@ -146,8 +146,8 @@ class AvroDeserializer {
 
   // Returns true iff the colid is needed by the query.
   private boolean isNeededColumn(boolean topLevel, int curIdx, int colId){
-    if (!topLevel || queryCols == null ||
-        (curIdx < queryCols.size() && queryCols.get(curIdx) == colId))
+    if (!topLevel || readColumnArray == null ||
+        (curIdx < readColumnArray.size() && readColumnArray.get(curIdx) == colId))
       return true;
     return false;
   }
@@ -156,7 +156,7 @@ class AvroDeserializer {
   private List<Object> workerBase(List<Object> objectRow, List<String> columnNames, List<TypeInfo> columnTypes, GenericRecord record, boolean topLevel) throws HaivvreoException {
     
     int idx =0;
-    if (topLevel && queryCols != null)
+    if (topLevel && readColumnArray != null)
       optimRecordCount++;
     for(int i = 0; i < columnNames.size(); i++) {
       TypeInfo columnType = columnTypes.get(i);
@@ -165,8 +165,8 @@ class AvroDeserializer {
         // This column was requested in query columns, so process it
         Object datum = record.get(columnName);
         Schema datumSchema = record.getSchema().getField(columnName).schema();
-        if(logColumnsRequested && topLevel && queryCols != null) {
-          LOG.debug("Haivvreo DEBUG: ColumnAsked is:" + columnName + " Query cols size: " + queryCols.size() + " Columns Size:  " + columnNames.size() + ":counter:" + i + " index " + idx);
+        if(logColumnsRequested && topLevel && readColumnArray != null) {
+          LOG.debug("Haivvreo DEBUG: ColumnAsked is:" + columnName + " Query cols size: " + readColumnArray.size() + " Columns Size:  " + columnNames.size() + ":counter:" + i + " index " + idx);
         }
         objectRow.add(worker(datum, datumSchema, columnType));
         idx++;
