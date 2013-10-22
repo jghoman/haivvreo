@@ -42,6 +42,7 @@ import java.util.Map;
 
 class AvroDeserializer {
   private static final Log LOG = LogFactory.getLog(AvroDeserializer.class);
+  private static boolean alreadyReported =  false;
   /**
    * When encountering a record with an older schema than the one we're trying
    * to read, it is necessary to re-encode with a reader against the newer schema.
@@ -116,7 +117,11 @@ class AvroDeserializer {
 
     // Check if we're working with an evolved schema
     if(!r.getSchema().equals(readerSchema)) {
-      LOG.warn("Received different schemas.  Have to re-encode: " + r.getSchema().toString(false));
+      if(!alreadyReported) {
+        LOG.warn("Received different schemas.  Have to re-encode record schema: " + r.getSchema().toString(false)
+          +"\nreader schema :" + readerSchema.toString());
+    	alreadyReported = true;
+      }
       if(reEncoder == null) reEncoder = new SchemaReEncoder();
       r = reEncoder.reencode(r, readerSchema);
     }
