@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.ql.exec.Utilities;
-import org.apache.hadoop.hive.ql.plan.MapredWork;
+import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.serde2.SerDe;
@@ -89,8 +89,8 @@ public class AvroSerDe implements SerDe {
   private Properties determineCorrectProperties(Configuration configuration, Properties properties) {
     if((configuration instanceof JobConf) && HaivvreoUtils.insideMRJob((JobConf) configuration)) {
       LOG.info("In MR job, extracting table-level properties");
-      MapredWork mapRedWork = Utilities.getMapRedWork(configuration);
-      LinkedHashMap<String,PartitionDesc> a = mapRedWork.getAliasToPartnInfo();
+      MapWork mapWork = Utilities.getMapWork(configuration);
+      LinkedHashMap<String, PartitionDesc> a = mapWork.getAliasToPartnInfo();
       if(a.size() == 1) {
         LOG.info("Only one PartitionDesc found.  Returning that Properties");
         PartitionDesc p = a.values().iterator().next();

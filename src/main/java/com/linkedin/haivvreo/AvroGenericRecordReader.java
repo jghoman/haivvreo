@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.Utilities;
-import org.apache.hadoop.hive.ql.plan.MapredWork;
+import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.*;
@@ -79,11 +79,11 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
     FileSystem fs = split.getPath().getFileSystem(job);
     // Inside of a MR job, we can pull out the actual properties
     if(HaivvreoUtils.insideMRJob(job)) {
-      MapredWork mapRedWork = Utilities.getMapRedWork(job);
+      MapWork mapWork = Utilities.getMapWork(job);
 
       // Iterate over the Path -> Partition descriptions to find the partition
       // that matches our input split.
-      for (Map.Entry<String,PartitionDesc> pathsAndParts: mapRedWork.getPathToPartitionInfo().entrySet()){
+      for (Map.Entry<String,PartitionDesc> pathsAndParts: mapWork.getPathToPartitionInfo().entrySet()){
         String partitionPath = pathsAndParts.getKey();
         if(pathIsInPartition(split.getPath().makeQualified(fs), partitionPath)) {
           if(LOG.isInfoEnabled()) LOG.info("Matching partition " + partitionPath + " with input split " + split);
