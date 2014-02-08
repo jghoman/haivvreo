@@ -5,7 +5,7 @@
   <groupId>com.linkedin</groupId>
   <artifactId>haivvreo</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.13-avro174-hive81</version>
+  <version>1.1.0-avro175-hive12</version>
   <name>haivvreo</name>
   <url>https://github.com/jghoman/haivvreo</url>
   <description>Library for processing Avro data in Hive.</description>
@@ -51,9 +51,9 @@
   </build>
 
   <properties>
-    <avro.version>1.7.4</avro.version>
-    <hive.version>0.8.1</hive.version>
-    <hadoop.version>1.0.2</hadoop.version>
+    <avro.version>1.7.5</avro.version>
+    <hive.version>0.12.0</hive.version>
+    <hadoop.version>1.2.1</hadoop.version>
   </properties>
 
   <repositories>

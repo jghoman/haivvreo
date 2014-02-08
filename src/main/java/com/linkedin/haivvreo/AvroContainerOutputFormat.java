@@ -25,12 +25,15 @@ import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.FileSinkOperator;
 import org.apache.hadoop.hive.ql.io.HiveOutputFormat;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.RecordWriter;
+import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.util.Progressable;
 
 import java.io.IOException;
@@ -70,4 +73,23 @@ public class AvroContainerOutputFormat implements HiveOutputFormat<LongWritable,
     return new AvroGenericRecordWriter(dfw);
   }
 
+  //no records will be emitted from Hive
+  @Override
+  public RecordWriter<LongWritable, AvroGenericRecordWritable>
+  getRecordWriter(FileSystem ignored, JobConf job, String name,
+      Progressable progress) {
+    return new RecordWriter<LongWritable, AvroGenericRecordWritable>() {
+      public void write(LongWritable key, AvroGenericRecordWritable value) {
+        throw new RuntimeException("Should not be called");
+      }
+
+      public void close(Reporter reporter) {
+      }
+    };
+  }
+
+  @Override
+  public void checkOutputSpecs(FileSystem ignored, JobConf job) throws IOException {
+    return; // Not doing any check
+  }  
 }
