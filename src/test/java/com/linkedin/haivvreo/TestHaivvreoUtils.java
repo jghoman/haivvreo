@@ -108,26 +108,29 @@ public class TestHaivvreoUtils {
 
   @Test(expected=HaivvreoException.class)
   public void determineSchemaThrowsExceptionIfNoSchema() throws IOException, HaivvreoException {
+    Configuration conf = new Configuration();
     Properties prop = new Properties();
-    HaivvreoUtils.determineSchemaOrThrowException(prop);
+    HaivvreoUtils.determineSchemaOrThrowException(conf, prop);
   }
 
   @Test
   public void determineSchemaFindsLiterals() throws Exception {
     String schema = TestAvroObjectInspectorGenerator.RECORD_SCHEMA;
+    Configuration conf = new Configuration();
     Properties props = new Properties();
     props.put(HaivvreoUtils.SCHEMA_LITERAL, schema);
     Schema expected = Schema.parse(schema);
-    assertEquals(expected, HaivvreoUtils.determineSchemaOrThrowException(props));
+    assertEquals(expected, HaivvreoUtils.determineSchemaOrThrowException(conf, props));
   }
 
   @Test
   public void detemineSchemaTriesToOpenUrl() throws HaivvreoException, IOException {
+    Configuration conf = new Configuration();
     Properties props = new Properties();
     props.put(HaivvreoUtils.SCHEMA_URL, "not:///a.real.url");
 
     try {
-      HaivvreoUtils.determineSchemaOrThrowException(props);
+      HaivvreoUtils.determineSchemaOrThrowException(conf, props);
       fail("Should have tried to open that URL");
     } catch(MalformedURLException e) {
       assertEquals("unknown protocol: not", e.getMessage());
@@ -136,13 +139,14 @@ public class TestHaivvreoUtils {
 
   @Test
   public void noneOptionWorksForSpecifyingSchemas() throws IOException, HaivvreoException {
+    Configuration conf = new Configuration();
     Properties props = new Properties();
 
     // Combo 1: Both set to none
     props.put(SCHEMA_URL, SCHEMA_NONE);
     props.put(SCHEMA_LITERAL, SCHEMA_NONE);
     try {
-      determineSchemaOrThrowException(props);
+      determineSchemaOrThrowException(conf, props);
       fail("Should have thrown exception with none set for both url and literal");
     } catch(HaivvreoException he) {
       assertEquals(EXCEPTION_MESSAGE, he.getMessage());
@@ -152,7 +156,7 @@ public class TestHaivvreoUtils {
     props.put(SCHEMA_LITERAL, TestAvroObjectInspectorGenerator.RECORD_SCHEMA);
     Schema s;
     try {
-      s = determineSchemaOrThrowException(props);
+      s = determineSchemaOrThrowException(conf, props);
       assertNotNull(s);
       assertEquals(Schema.parse(TestAvroObjectInspectorGenerator.RECORD_SCHEMA), s);
     } catch(HaivvreoException he) {
@@ -163,7 +167,7 @@ public class TestHaivvreoUtils {
     props.put(SCHEMA_LITERAL, SCHEMA_NONE);
     props.put(SCHEMA_URL, "not:///a.real.url");
     try {
-      determineSchemaOrThrowException(props);
+      determineSchemaOrThrowException(conf, props);
       fail("Should have tried to open that bogus URL");
     } catch(MalformedURLException e) {
       assertEquals("unknown protocol: not", e.getMessage());

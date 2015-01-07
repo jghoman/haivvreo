@@ -53,7 +53,7 @@ public class AvroContainerOutputFormat implements HiveOutputFormat<LongWritable,
                                                            Progressable progressable) throws IOException {
     Schema schema;
     try {
-      schema = HaivvreoUtils.determineSchemaOrThrowException(properties);
+      schema = HaivvreoUtils.determineSchemaOrThrowException(jobConf, properties);
     } catch (HaivvreoException e) {
       throw new IOException(e);
     }
