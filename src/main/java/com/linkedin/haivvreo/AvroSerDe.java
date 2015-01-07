@@ -65,7 +65,7 @@ public class AvroSerDe implements SerDe {
 
     properties = determineCorrectProperties(configuration, properties);
 
-    schema =  HaivvreoUtils.determineSchemaOrReturnErrorSchema(properties);
+    schema =  HaivvreoUtils.determineSchemaOrReturnErrorSchema(configuration, properties);
     if(configuration == null) {
       LOG.info("Configuration null, not inserting schema");
     } else {

@@ -47,7 +47,8 @@ class HaivvreoUtils {
    * @throws IOException if error while trying to read the schema from another location
    * @throws HaivvreoException if unable to find a schema or pointer to it in the properties
    */
-  public static Schema determineSchemaOrThrowException(Properties properties) throws IOException, HaivvreoException {
+  public static Schema determineSchemaOrThrowException(Configuration conf, Properties properties)
+      throws IOException, HaivvreoException {
     String schemaString = properties.getProperty(SCHEMA_LITERAL);
     if(schemaString != null && !schemaString.equals(SCHEMA_NONE))
       return Schema.parse(schemaString);
@@ -59,7 +60,7 @@ class HaivvreoUtils {
 
     try {
       if(schemaString.toLowerCase().startsWith("hdfs://"))
-        return getSchemaFromHDFS(schemaString, new Configuration());
+        return getSchemaFromHDFS(schemaString, conf);
     } catch(IOException ioe) {
       throw new HaivvreoException("Unable to read schema from HDFS: " + schemaString, ioe);
     }
@@ -74,9 +75,9 @@ class HaivvreoUtils {
    * any call, including calls to update the serde properties, meaning
    * if the serde is in a bad state, there is no way to update that state.
    */
-  public static Schema determineSchemaOrReturnErrorSchema(Properties props) {
+  public static Schema determineSchemaOrReturnErrorSchema(Configuration conf, Properties props) {
     try {
-      return determineSchemaOrThrowException(props);
+      return determineSchemaOrThrowException(conf, props);
     } catch(HaivvreoException he) {
       LOG.warn("Encountered HaivvreoException determining schema. Returning signal schema to indicate problem", he);
       return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;

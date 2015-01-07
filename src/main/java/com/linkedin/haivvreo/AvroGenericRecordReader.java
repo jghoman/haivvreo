@@ -90,7 +90,7 @@ public class AvroGenericRecordReader implements RecordReader<NullWritable, AvroG
 
           Properties props = pathsAndParts.getValue().getProperties();
           if(props.containsKey(HaivvreoUtils.SCHEMA_LITERAL) || props.containsKey(HaivvreoUtils.SCHEMA_URL)) {
-            return HaivvreoUtils.determineSchemaOrThrowException(props);
+            return HaivvreoUtils.determineSchemaOrThrowException(job, props);
           } else
             return null; // If it's not in this property, it won't be in any others
         }
