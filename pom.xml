@@ -60,7 +60,7 @@
     <repository>
       <id>maven</id>
       <name>Maven 2 repo</name>
-      <url>http://repo1.maven.org/maven2/</url>
+      <url>https://repo1.maven.org/maven2/</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -68,11 +68,11 @@
     <repository>
       <id>scala</id>
       <name>Scala tools</name>
-      <url>http://scala-tools.org/repo-releases</url>
+      <url>https://scala-tools.org/repo-releases</url>
     </repository>
     <repository>
       <id>repository.jboss.org</id>
-      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -103,7 +103,7 @@
       <!-- hive 8 brings in datanucleus via this repo -->
       <id>datanucleus</id>
       <name>datanucleus</name>
-      <url>http://www.datanucleus.org/downloads/maven2/</url>
+      <url>https://www.datanucleus.org/downloads/maven2/</url>
     </repository>
   </repositories>
   <dependencies>
